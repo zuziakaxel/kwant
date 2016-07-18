@@ -11,10 +11,10 @@ f_B2au=4.254382E-6
 
 def onsite_e(sitei, dx, m, mu, delta):
     t = 1/2.0/m/dx/dx
-    return mu
+    return -mu
 def onsite_h(sitei, dx, m, mu, delta):
     t = 1/2.0/m/dx/dx
-    return -mu
+    return mu
 
 def hopping_electron(sitei, sitej, dx, m, mu, delta):
     t = 1/2.0/m/dx/dx
@@ -24,11 +24,19 @@ def hopping_hole(sitei, sitej, dx, m, mu, delta):
     t = 1/2.0/m/dx/dx
     return t
 
-def hopping_hole_electron(sitei, sitej, dx, m, mu, delta):
+def hopping_hole_electron_plus(sitei, sitej, dx, m, mu, delta):
+    t = 1/2.0/m/dx/dx
+    return -delta
+
+def hopping_electron_hole_plus(sitei, sitej, dx, m, mu, delta):
     t = 1/2.0/m/dx/dx
     return delta
 
-def hopping_electron_hole(sitei, sitej, dx, m, mu, delta):
+def hopping_hole_electron_minus(sitei, sitej, dx, m, mu, delta):
+    t = 1/2.0/m/dx/dx
+    return delta
+
+def hopping_electron_hole_minus(sitei, sitej, dx, m, mu, delta):
     t = 1/2.0/m/dx/dx
     return -delta
 
@@ -41,22 +49,17 @@ def make_system(L, dx, m, mu, delta):
     sys[(lat_h(i) for i in range(L))] = onsite_h
     # sys[lat_e.neighbors()] = hopping
     # sys[lat_h.neighbors()] = hopping
-    sys[kwant.builder.HoppingKind((1,), lat_e, lat_h)] = hopping_electron_hole
+    sys[kwant.builder.HoppingKind((1,), lat_e, lat_h)] = hopping_electron_hole_plus
     # sys[kwant.builder.HoppingKind((1,), lat_h, lat_e)] = hopping_hole_electron
     sys[kwant.builder.HoppingKind((1,), lat_e, lat_e)] = hopping_electron
     sys[kwant.builder.HoppingKind((1,), lat_h, lat_h)] = hopping_hole
     # sys[kwant.builder.HoppingKind((-1,), lat_e, lat_h)] = hopping_electron_hole
-    sys[kwant.builder.HoppingKind((-1,), lat_e, lat_h)] = hopping_hole_electron
+    sys[kwant.builder.HoppingKind((-1,), lat_e, lat_h)] = hopping_hole_electron_minus
     sys[kwant.builder.HoppingKind((-1,), lat_e, lat_e)] = hopping_electron
     sys[kwant.builder.HoppingKind((-1,), lat_h, lat_h)] = hopping_hole
 
     sys = sys.finalized()
     return sys
-
-# def plot_spectrum(sys, muArray, delta):
-#     energies = []
-#     for
-
 
 # L = 25
 # dx = 0.1
@@ -113,5 +116,5 @@ for i in range(steps):
     lat = kwant.lattice.chain(dx)
     psi= dict(zip(sites, v[:,1])) #gny chcemy stan zero
     for i in range(L):
-      f.write("%e %e\n" % (i*dx, np.abs(psi[lat(i)] )))
-    #   f.write("%e %e\n" % (mu/temp_t, e[i]/(temp_t)))
+    #   f.write("%e %e\n" % (i*dx, np.abs(psi[lat(i)] )))
+      f.write("%e %e\n" % (mu/temp_t, e[i]/(temp_t)))
