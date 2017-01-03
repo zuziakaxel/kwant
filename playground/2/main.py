@@ -63,43 +63,50 @@ delta = t
 steps = 100
 mu = 1
 sys = make_system(L, dx, t, mu, delta)
-# for i in range(steps):
-#     mu = t*3*i/steps # mu/t : [0; 3]
-#
-#     # print("delta = %e\n mu = %e\n t = %e\nmu/t = %e" % (delta, mu, temp_t, mu/temp_t))
-#
-#     ham_mat = sys.hamiltonian_submatrix(args=[dx,t, mu, delta], sparse=False)
-#     e, v = la.eigh(ham_mat)
-#     sites= sys.sites # funckaj ktora zwraca poszczegolne wezly
-#     lat = kwant.lattice.chain(dx)
-#     psi= dict(zip(sites, v[:,1])) #gny chcemy stan zero
-#     print(psi)
-    # for i in range(L):
 
+data_files = []
+for i in range(2*L):
+    data_files.append(open("dane/data%d.dat" % (i), 'w'))
+
+for i in range(steps):
+    mu = t*3*i/steps # mu/t : [0; 3]
+
+    print("delta = %e\n mu = %e\n mu/t = %e" % (delta, mu, mu/t))
+
+    ham_mat = sys.hamiltonian_submatrix(args=[dx,t, mu, delta], sparse=False)
+    e, v = la.eigh(ham_mat)
+    sites= sys.sites # funckaj ktora zwraca poszczegolne wezly
+    lat = kwant.lattice.chain(dx)
+    psi= dict(zip(sites, v[:,1])) #gny chcemy stan zero
+    # print(psi)
+    for i in range(L):
+        data_files[i].write("%e %e\n" % (mu/t, e[i]/t))
+    for i in range(L):
+        data_files[L+i].write("%e %e\n" % (mu/t, -e[i]/t))
     #   f.write("%e %e\n" % (i*dx, np.abs(psi[lat(i)] )))
-    #   f.write("%e %e\n" % (mu/t, e[i]/t))
 
-mu = 2.5
-ham_mat = sys.hamiltonian_submatrix(args=[dx,t, mu, delta], sparse=False)
-e, v = la.eigh(ham_mat)
-sites= sys.sites
-lat_e = kwant.lattice.chain(dx, name="e")
-lat_h = kwant.lattice.chain(dx, name="h")
-lat = lat_e
-# knocks = []
+
+# mu = 2.5
+# ham_mat = sys.hamiltonian_submatrix(args=[dx,t, mu, delta], sparse=False)
+# e, v = la.eigh(ham_mat)
+# sites= sys.sites
+# lat_e = kwant.lattice.chain(dx, name="e")
+# lat_h = kwant.lattice.chain(dx, name="h")
+# lat = lat_e
+# # knocks = []
+# # for i in range(L):
+# #     knocks.append(lat_e(i))
+# # for i in range(L):
+# #     knocks.append(lat_h(i))
+#
+# ##### SAVE wave function of the state corresponding to the pair of Majorana modes
+# majorana_data = open('majorana_data.dat', 'w')
+# psi= dict(zip(sites, v[:,L]))
 # for i in range(L):
-#     knocks.append(lat_e(i))
+#     majorana_data.write("%e %e\n" % (i,np.abs(psi[lat_e(i)].real)**2 + np.abs(psi[lat_h(i)].real)**2))
+#
+# ##### SAVE wave function of the first excited state
+# majorana_data = open('first_state.dat', 'w')
+# psi= dict(zip(sites, v[:,1]))
 # for i in range(L):
-#     knocks.append(lat_h(i))
-
-##### SAVE wave function of the state corresponding to the pair of Majorana modes
-majorana_data = open('majorana_data.dat', 'w')
-psi= dict(zip(sites, v[:,L]))
-for i in range(L):
-    majorana_data.write("%e %e\n" % (i,np.abs(psi[lat_e(i)].real)**2 + np.abs(psi[lat_h(i)].real)**2))
-
-##### SAVE wave function of the first excited state
-majorana_data = open('first_state.dat', 'w')
-psi= dict(zip(sites, v[:,1]))
-for i in range(L):
-    majorana_data.write("%e %e\n" % (i,np.abs(psi[lat(i)].real)))
+#     majorana_data.write("%e %e\n" % (i,np.abs(psi[lat(i)].real)))

@@ -4,29 +4,15 @@ import numpy as np
 
 
 m=1
-alpha = 1.2*f_eV2au
 alpha = 0.0
-E_so = alpha*alpha/f_eV2au
-# L_so = 1.0/(alpha)
-# delta = 0.25*E_so
-delta = 0.1*f_eV2au
-L = 50
-# dx = L_so/L
+delta = 0.1
+L = 100
 dx = 0.1*f_nm2au
 t = 1.0/2.0/m
 mu = 0.0*f_eV2au
 Bx = 0.0*f_B2au
 By = 0.0*f_B2au
-# delta = 0.0*f_eV2au
-# alpha = 0.02*f_eV2au*f_nm2au
 
-# es = simulate(L=L, dx=dx, t=t, mu=mu, Bx=Bx, By=By, delta=delta, alpha=alpha)
-
-
-# alpha_s = [(float(i)/10.0) for i in range(1,10)]
-
-# by_s = [i*100 for i in range(1,100)]
-# mus = [i/100 for i in range(10)]
 i = 0
 data_x = []
 data_a = []
@@ -36,12 +22,8 @@ data_e2 = []
 data_e3 = []
 data_e4 = []
 data_e5 = []
-# for alpha in alpha_s:
-#     E_so = alpha*alpha*f_eV2au*f_eV2au
-#     L_so = 1/alpha/f_eV2au
-#     delta = 0.25*E_so
-# bx_s = [(float(i)/10.0)*E_so for i in range(0,12)]
-bx_s = [(float(i)/1000.0) for i in range(0,600)]
+
+bx_s = [(float(i)/10000000000.0) for i in range(1000000500,1000005000)]
 for bx in bx_s:
 
     i += 1
@@ -64,7 +46,9 @@ for bx in bx_s:
     # eigen = min(map(lambda x: abs(x), es))
     # print(len(es))
     # data_e.append(eigen)
-    data_e0.append(-es[(L*2)])
+    min((abs(x), x) for x in es)[1]
+    data_e0.append(min(es, key=abs))
+    # data_e0.append(-es[(L*2)])
     data_e1.append(es[(L*2) + 1])
     data_e2.append(-es[(L*2) - 1])
     data_e3.append(es[(L*2) + 2])
@@ -72,7 +56,7 @@ for bx in bx_s:
     data_e5.append(es[(L*2) - 3])
     # print(min(map(lambda x: abs(x), e)))
     for e in es:
-        if abs(e) <= 1e-9:
+        if abs(e) <= 1e-11:
             print("Znaleziono: %.9f" % e)
 # with open('data.dat', mode='w') as f:
 #     for e,a,d in data:
@@ -97,12 +81,12 @@ import matplotlib.pyplot as plt
 
 # fig, ax = plt.subplots()
 
-plt.plot(data_x, data_e0, label='e0')
-plt.plot(data_x, data_e1, label='e1')
-plt.plot(data_x, data_e2, label='e2')
-plt.plot(data_x, data_e3, label='e3')
-plt.plot(data_x, data_e4, label='e4')
-plt.plot(data_x, data_e5, label='e5')
+plt.scatter(data_x, data_e0, label='e0')
+# plt.plot(data_x, data_e1, label='e1')
+# plt.plot(data_x, data_e2, label='e2')
+# plt.plot(data_x, data_e3, label='e3')
+# plt.plot(data_x, data_e4, label='e4')
+# plt.plot(data_x, data_e5, label='e5')
 plt.grid()
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 # ax.set_xlabel('Bx')
