@@ -4,6 +4,7 @@ from numpy import linalg as la
 import kwant
 import numpy as np
 import scipy.sparse.linalg as sla
+import matplotlib.pyplot as plt
 
 f_nm2au = 18.89726133921252
 f_eV2au = 0.03674932587122423
@@ -60,30 +61,46 @@ t = 1
 L = 25
 dx = 0.1*f_nm2au
 delta = t
-steps = 100
+steps = 200
 mu = 1
 sys = make_system(L, dx, t, mu, delta)
 
 data_files = []
+data_files_v = []
 for i in range(2*L):
     data_files.append(open("dane/data%d.dat" % (i), 'w'))
 
+
 for i in range(steps):
-    mu = t*3*i/steps # mu/t : [0; 3]
+    data_files_v.append(open("dane/v/data%d.dat" % (i), 'w'))
+    mu = t*4.0*i/steps # mu/t : [0; 3]
 
     print("delta = %e\n mu = %e\n mu/t = %e" % (delta, mu, mu/t))
 
     ham_mat = sys.hamiltonian_submatrix(args=[dx,t, mu, delta], sparse=False)
     e, v = la.eigh(ham_mat)
     sites= sys.sites # funckaj ktora zwraca poszczegolne wezly
-    lat = kwant.lattice.chain(dx)
-    psi= dict(zip(sites, v[:,1])) #gny chcemy stan zero
-    # print(psi)
-    for i in range(L):
-        data_files[i].write("%e %e\n" % (mu/t, e[i]/t))
-    for i in range(L):
-        data_files[L+i].write("%e %e\n" % (mu/t, -e[i]/t))
-    #   f.write("%e %e\n" % (i*dx, np.abs(psi[lat(i)] )))
+    psi= dict(zip(sites, v[:,49])) #gny chcemy stan zero
+    print(len(v))
+    psi_m = dict(zip(sites, v[:,L]))
+    lat_e = kwant.lattice.chain(dx, name="e")
+    lat_h = kwant.lattice.chain(dx, name="h")
+    x_s = []
+    ground = []
+    majorana = []
+    for w in range(L):
+        # data_files_v[i].write("%e")
+        x_s.append(w)
+        ground.append(np.abs(psi[lat_e(w)].real + psi[lat_e(w)].imag)**2 + np.abs(psi[lat_h(w)].real + psi[lat_h(w)].imag)**2)
+        majorana.append(np.abs(psi_m[lat_e(w)].real)**2 + np.abs(psi_m[lat_h(w)].real)**2)
+        data_files[w].write("%e %e\n" % (mu/t, e[w]/t))
+        # f.write("%e %e\n" % (i*dx, np.abs(psi[lat(i)] )))
+        # plt.plot(np.abs(psi[lat(i)]))
+        # plt.show()
+    for l in range(L):
+        data_files[L+l].write("%e %e\n" % (mu/t, -e[l]/t))
+    for j in range(L):
+        data_files_v[i].write("%e %e\n" % (x_s[j], majorana[j]))
 
 
 # mu = 2.5
